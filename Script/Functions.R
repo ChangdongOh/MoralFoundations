@@ -116,7 +116,7 @@ mergeUserDic(data.frame(c("문재인","이정희","황천모","안철수","노�
 
 options(java.parameters = "-Xmx8g")
 
-stopwords <- tolower(str_replace_all(read.csv("~/Git/R/KPTM/stopwords.csv", quote="\"", stringsAsFactors=FALSE, header=F)[,1],"/",""))
+stopwords <- tolower(str_replace_all(read.csv("Data/stopwords.csv", quote="\"", stringsAsFactors=FALSE, header=F)[,1],"/",""))
 newstopwords=c("조윤선nc","나pv","들pv","총선nc","선대위nc","우리nc","관련해nc","정론관nc","지금까지nc",
                "보이nc","그러하pa","대변인실nc")
 stopwords<-c(stopwords,newstopwords)

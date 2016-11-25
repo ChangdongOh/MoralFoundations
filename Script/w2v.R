@@ -1,18 +1,13 @@
 library(wordVectors)
 
-model = train_word2vec("tokenizedmin.txt",output="minjoo_vectors.bin",threads = 4,vectors = 10000,min_count=20,window=10,iter=12)
-model=read.vectors("데이터/saenuri_vectors.bin")
+model = train_word2vec("Data/Word2Vec/tokenizedmin.txt",output="minjoo_vectors.bin",threads = 4,vectors = 300,min_count=20,window=10,iter=18)
+#model=read.vectors("Data/Word2Vec/minjoo_vectors.bin")
 
 #도덕기반 이름 리스트 활용해 파일에서 불러와 변수로 할당
 MFname=c('HarmVirtue','HarmVice','FairnessVirtue','FairnessVice','IngroupVirtue','IngroupVice','AuthorityVirtue','AuthorityVice','PurityVirtue','PurityVice')
 #MFname=paste0(MFname,'ext')
 for(i in MFname){
-  assign(i,read.csv(paste0('도덕기반사전/', i,'.csv'),sep="", stringsAsFactors=FALSE)[,1])
-}
-
-for(i in MFname){
-  assign(paste0(i,'ext'),c(eval(parse(text=i)),names(nearest_to(model,model[[eval(parse(text=i))]],50))))
-  #write.csv(c(eval(parse(text=i)),names(nearest_to(model,model[[eval(parse(text=i))]],50))),paste0(i,'min.csv'),row.names=F)
+  assign(i,read.csv(paste0('Moral_Foundations_Dictionary/', i,'.csv'),sep="", stringsAsFactors=FALSE)[,1])
 }
 
 candandparty=c("박근혜nc","문재인nc","새누리당nc","민주당nc","이명박nc","노무현nc")
@@ -69,7 +64,7 @@ write.csv(frame,'minmergedext.csv')
 
 #두 후보자 사이의 간격 구하는 작업이고 이게 핵심이었
 
-cleavage=model[['박근혜nc']]-model[['문재인nc']]
+cleavage=model[['문재인nc']]-model[['박근혜nc']]
 harm=model[[HarmVirtue]]-model[[HarmVice]]
 fair=model[[FairnessVirtue]]-model[[FairnessVice]]
 ingroup=model[[IngroupVirtue]]-model[[IngroupVice]]
