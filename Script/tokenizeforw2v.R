@@ -2,12 +2,11 @@ library(KoNLP)
 library(stringr)
 
 
-source("Script/함수정리.R", encoding="UTF-8")
-source("형태소분리.R", encoding="UTF-8")
+source("Script/Functions.R", encoding="UTF-8")
 
 
-sae<-partydata(sae)
-min<-partydata(min)
+sae<-partydata(sae,2011)
+min<-partydata(min,2011)
 
 texts=c(min,sae)
 
