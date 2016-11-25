@@ -33,21 +33,26 @@ def urlparser(year, page):
     
     
 def article(url):
-    url='http://theminjoo.kr'+url
-    print(url)
+    #print(url)
     soup=BeautifulSoup(requests.get(url).text,'lxml')
     date=soup.find('td',class_='date').find('span').text
     article=soup.find('div',class_='editor_cont').text
     article=re.sub("(\d+)[.]\s+(\d+)[.]\s+(\d+)",r"\1년 \2월 \3일", article)
     article=re.sub('[^가-힣]+',' ',article)
     if '년 월 일' in article:
-        article=re.split('년 월 일', article)[-2]
-    print([date,article])
-    return [date,article]
+        if len(re.split('년 월 일', article))>2:
+            article_new=''
+            for i in re.split('년 월 일', article)[0:-1]:
+                article_new+=i
+            article=article_new
+            #print(article)
+        else: article=re.split('년 월 일', article)[-2]
+    #print([date,article])
+    return [url, date,article]
     
 for year in range(2008, 2017):
     import csv
-    with open('MoralFoundations\Data\새누리{0}.csv'.format(str(year)),'w', encoding='UTF8', newline='') as f:
+    with open('새누리{0}.csv'.format(str(year)),'w', encoding='UTF8', newline='') as f:
         w=csv.writer(f)
         more=True
         page=1

@@ -2,7 +2,7 @@ library(KoNLP)
 library(stringr)
 
 
-source("읽어오기.R", encoding="UTF-8")
+source("Script/함수정리.R", encoding="UTF-8")
 source("형태소분리.R", encoding="UTF-8")
 
 

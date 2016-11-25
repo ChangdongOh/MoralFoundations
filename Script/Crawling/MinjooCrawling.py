@@ -30,18 +30,23 @@ def urlparser(year, page):
     
 def article(url):
     url='http://theminjoo.kr'+url
-    print(url)
     soup=BeautifulSoup(requests.get(url).text,'lxml')
     date=soup.find('span',class_='txt').text
     article=soup.find('div',class_='cont').text
     article=re.sub("(\d+)[.]\s+(\d+)[.]\s+(\d+)",r"\1년 \2월 \3일", article)
     article=re.sub('[^가-힣]+',' ',article)
     if '년 월 일' in article:
-        article=re.split('년 월 일', article)[-2]
-    print([date,article])
-    return [date,article]
+        if len(re.split('년 월 일', article))>2:
+            article_new=''
+            for i in re.split('년 월 일', article)[0:-1]:
+                article_new+=i
+            article=article_new
+            print(article)
+        else: article=re.split('년 월 일', article)[-2]    
+    print([url, date,article])
+    return [url, date,article]
     
-for year in range(2008, 2017):
+for year in range(2012, 2017):
     import csv
     with open('MoralFoundations\Data\민주{0}.csv'.format(str(year)),'w', encoding='UTF8', newline='') as f:
         w=csv.writer(f)
@@ -51,9 +56,11 @@ for year in range(2008, 2017):
             url_list, more=urlparser(year, page)
             for url in url_list:
                 w.writerow(article(url))
-                time.sleep(3)
+                time.sleep(1)
             page+=1
             
+            
+#'4대강 사업' 등을 재처리할 필요 있음
             
         
     
