@@ -56,15 +56,16 @@ partydata=function(partyname, year){
     texts<- gsub("시민캠프","민주당", texts)
     texts<- gsub("논문표절","논문 표절", texts)
     texts<- gsub("굴림","", texts)
+    texts<-str_replace_all(texts, "[가-힣]{2,4} 대변인|([가-힣]\\s{1,3}){3}대변인","")
     return(texts)
   }
   if(partyname=='min'){
-    min <- read_csv(paste0("Data/민주",as.character(year),".csv"),col_names = FALSE)    
+    min <- read_csv(paste0("Data/Raw Data/민주",as.character(year),".csv"),col_names = FALSE)    
     min<-min$X3
     min<-unique(str_replace_all(min,"[^가-힣]+"," "))
     minjoo<-as.character()
     for(i in min){
-      if(nchar(i)>=200){
+      if(nchar(i) >=200 & !is.na(i)){
         minjoo=c(minjoo,i)
       }
     }
@@ -72,12 +73,13 @@ partydata=function(partyname, year){
     texts<-samewords(texts)
   }
   if(partyname=='sae'){
-    sae <- read.csv(paste0("Data/새누리",as.character(year),".csv"),col_names = FALSE)    
+    sae <- read_csv(paste0("Data/Raw Data/새누리",as.character(year),".csv"),
+                    col_names = FALSE)    
     sae<-sae$X3
     sae<-unique(str_replace_all(sae,"[^가-힣]+"," "))
     saenuri<-as.character()
     for(i in sae){
-      if(nchar(i)>=200){
+      if(nchar(i)>=200 & !is.na(i)){
         saenuri=c(saenuri,i)
       }
     }
@@ -116,53 +118,52 @@ term=c("문재인","이정희","황천모","안철수","노무현","김종인",
     "당원","트렌드","소상공인","이명박근혜","시당",
     "떠벌림","북남선언","아연실책","수행부단장",
     "국정원","투표시간","프라이머리","여성",
-    "말바꾸기","친노","국민대통합")
+    "말바꾸기","친노","국민대통합","시민","이웃","기만")
 tag=rep('ncn',times=length(term))
 user_dic=data.frame(term=term,tag=tag)
 
-buildDictionary(ext_dic = c('sejong', 'woorimalsam'), user_dic=user_dic,replace_usr_dic = T)
+buildDictionary(ext_dic = c('sejong','insighter', 'woorimalsam'), user_dic=user_dic,replace_usr_dic = T)
 
 stopwords <- tolower(str_replace_all(read.csv("Data/stopwords.csv", quote="\"", stringsAsFactors=FALSE, header=F)[,1],"/",""))
 newstopwords=c("조윤선nc","나pv","들pv","총선nc","선대위nc","우리nc","관련해nc","정론관nc","지금까지nc",
                "보이nc","그러하pa","대변인실nc")
 stopwords<-c(stopwords,newstopwords)
 
-
-ko.words <- function(texts){
-  token<-as.character()
-  for(i in texts){
-    d <- as.character(i)
-    splited<-unlist(str_split(d," "))
-    for(j in splited){
-      j<-as.character(j)
-      pos <- paste(SimplePos22(j))
-      extracted <- str_match(pos, '([가-힣]+)/([NP][ACV])')
-      keyword <- extracted[,1]
-      if(is.na(keyword)){next}
-      if(str_detect(keyword,'[가-힣]/[NC]') & nchar(keyword)==4){next}
-      #KoNLP 특성상 ~~들 형태의 명사를 잘 구분해 내지 못하는 한계가 있기 때문에 ~들 제거. 
-      #정규식 사용해 한글 2글자 이상과 '들'이 붙어있는 경우를 골라내고
-      if(str_detect(keyword,"[가-힣]{2,}들/[NC]")){
-        #'들'에 따라서 문자열을 나눠버린 다음 다시 합침(단순히 str_replace를 쓸 경우 문제 발생)
-        keyword<-str_replace_all(keyword,"들","")
-      }
-      token<-c(token, keyword[!is.na(keyword)])
+#KoNLP의 형태소 분석기가 단어 단위가 아니라 문장 단위로 입력을 받음. 새로 만들어야 함.
+ko.words<-function(texts){
+  #전체 문서 입력받고
+  token=as.character()
+  splited=str_split(texts,' ')[[1]]
+  for(i in splited){
+    if(nchar(i)>10){
+      next
     }
-  }
-  token
+    #마침표를 붙여줘야 단어 단위로 처리해도 문제 없이 진행 가능
+    extracted=SimplePos22(paste0(i,'.'))[[1]]
+    #여러 형태소가 +기호로 묶인 것 나눠주고
+    if(str_detect(extracted, '\\+')){
+      extracted=str_split(extracted,"\\+")[[1]]
+    }
+    #쓸모 없는 품사들 제거
+    extracted=str_match(extracted,'[가-힣]+/[^JEX][^XPTMIFBS]')[,1]
+    #NA인 것들 빼고 token에 넣어주기
+    token=c(token, extracted[!is.na(extracted)])
+  } 
+  return(token)
 }
 
 
 tokenizeforw2v<-function(texts, filename){
   i=1
   for(j in texts){
+    print(i)
     texts[i]=
     ko.words(j)%>%
-    str_replace_all("\\/","")%>%
-    tolower()%>%
+    #str_replace_all("\\/","")%>%
+    #tolower()%>%
     paste(collapse=" ")
     i=i+1
   }
-  write.csv(texts, paste0(filename,'.txt'), row.names=F)
+  write.table(texts,  paste0("Data/Word2Vec/",filename,'.txt'), sep=",",quote=F , col.names=F, row.names=F)
 }
 

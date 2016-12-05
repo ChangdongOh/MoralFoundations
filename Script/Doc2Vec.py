@@ -58,7 +58,9 @@ total_docs=[]
 for year in range(2008,2017):
     total_docs+=Tagged(year, '새누리')+Tagged(year, '민주')
  
+ 
 from gensim.models import doc2vec   
+
 model = doc2vec.Doc2Vec(size=300, alpha=0.025, min_alpha=0.025, window=10, min_count=20, workers=8) 
 model.build_vocab(total_docs)
 
@@ -68,7 +70,9 @@ for epoch in range(10):
     model.min_alpha = model.alpha # fix the learning rate, no decay
 #model.init_sims(replace=True)    
 #메모리 세이브용이나 infer_vector를 위해서는 쓰면 안 됨
-model.save('doc2vec.model')
+model.save('MoralFoundations/Data/Word2Vec/model.doc2vec') #vector space 저장
+
+model=doc2vec.Doc2Vec.load('MoralFoundations/Data/Word2Vec/model.doc2vec')
 
 from sklearn.metrics.pairwise import cosine_similarity
 cosine_similarity(model['평등/Noun'],model['공평/Noun'])
