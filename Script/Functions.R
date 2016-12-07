@@ -16,7 +16,8 @@ partydata=function(partyname, year){
     texts<- gsub("이명박 정부", "이명박", texts)
     texts<- gsub("한나라당", "새누리당", texts)
     texts<- gsub("통합민주당|통민당|통합 민주당|열린우리당|대통합민주신당
-                 |통합신당|민주통합당|민통당|열린우리당","민주당", texts)
+                 |통합신당|민주통합당|민통당|열린 우리당|
+                 더민주|더불어민주당|더불어 민주당","민주당", texts)
     texts<- gsub("이명박 정권", "이명박", texts)
     texts<- gsub("국민의 정부", "김대중", texts)
     texts<- gsub("문 후보", "문재인", texts)
@@ -71,6 +72,8 @@ partydata=function(partyname, year){
     }
     texts<-minjoo
     texts<-samewords(texts)
+    texts<-str_replace_all(texts," 우리당"," 민주당")
+    texts<-str_replace_all(texts," 우리 당"," 민주당")
   }
   if(partyname=='sae'){
     sae <- read_csv(paste0("Data/Raw Data/새누리",as.character(year),".csv"),
@@ -85,6 +88,8 @@ partydata=function(partyname, year){
     }
     texts<-saenuri
     texts<-samewords(texts)
+    texts<-str_replace_all(texts," 우리당"," 새누리당")
+    texts<-str_replace_all(texts," 우리 당"," 새누리당")
   }
   return(texts)
 }
@@ -155,8 +160,10 @@ ko.words<-function(texts){
 
 tokenizeforw2v<-function(texts, filename){
   i=1
+  len=length(texts)
   for(j in texts){
     print(i)
+    print(i/len)
     texts[i]=
     ko.words(j)%>%
     #str_replace_all("\\/","")%>%

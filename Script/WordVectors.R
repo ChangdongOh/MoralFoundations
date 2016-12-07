@@ -56,7 +56,7 @@ MFcomparing<-function(year){
 
 yearbyyear=vector('list',9)
 names(yearbyyear)=paste0('year',c(2008:2016))
-for(i in 2011:2016){
+for(i in 2008:2016){
   MFcomparing(i)
  # yearbyyear[[paste0('year',i)]]$Min=Minresult
  # yearbyyear[[paste0('year',i)]]$Sae=Saeresult
