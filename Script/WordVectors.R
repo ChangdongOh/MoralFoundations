@@ -22,6 +22,18 @@ MFcomparing<-function(year){
     assign(i,unique(read.csv(paste0('Data/Moral_Foundations_Dictionary/', i,'.csv'),sep="", stringsAsFactors=FALSE)[,1]))
   }
   
+  vcalculationeach<-function(model, party){
+    result=data.frame(Harm=numeric(3),Fairness=numeric(3),Ingroup=numeric(3),Authority=numeric(3),Purity=numeric(3),
+               row.names=c('Saenuri', 'Minjoo', 'Cleavage'))
+    for(i in MFname){
+      for(j in get(i)){
+        result[[i]]
+      }
+    }
+    
+  }
+  
+  
   #도덕기반과 정당별 계산하는 함수
   vcalculation<-function(model, party){
     Harm=model[[HarmVirtue]]-model[[HarmVice]]
